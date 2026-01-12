@@ -3,9 +3,12 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import path from 'path';
 
+const isGitHubPages = process.env.GITHUB_ACTIONS === 'true';
+const base = isGitHubPages ? '/lexicon/' : '/';
+
 export default defineConfig({
   // For GitHub Pages deployment
-  base: process.env.GITHUB_ACTIONS ? '/lexicon/' : '/',
+  base,
   plugins: [
     react(),
     VitePWA({
@@ -19,8 +22,8 @@ export default defineConfig({
         background_color: '#fefefe',
         display: 'standalone',
         orientation: 'any',
-        scope: '/',
-        start_url: '/',
+        scope: base,
+        start_url: base,
         icons: [
           {
             src: 'icons/icon-192.svg',
