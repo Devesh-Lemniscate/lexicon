@@ -1,0 +1,432 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ================================
+   FONT UTILITIES
+   Explicit font-family definitions
+   ================================ */
+
+.font-lora {
+  font-family: 'Lora', Georgia, serif !important;
+}
+
+.font-merriweather {
+  font-family: 'Merriweather', Georgia, serif !important;
+}
+
+.font-source-serif {
+  font-family: 'Source Serif 4', Georgia, serif !important;
+}
+
+.font-nunito {
+  font-family: 'Nunito', system-ui, sans-serif !important;
+}
+
+.font-crimson {
+  font-family: 'Crimson Text', Georgia, serif !important;
+}
+
+/* ================================
+   GLOBAL FOUNDATION
+   Apple Books / Kindle inspired
+   ================================ */
+
+:root {
+  --font-size-base: 18px;
+  --line-height-base: 1.8;
+  --max-reading-width: 38rem;
+  --page-margin: 1.25rem;
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-paper-light text-ink-light dark:bg-paper-dark dark:text-ink-dark;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* ================================
+   READER TYPOGRAPHY
+   The heart of the app
+   ================================ */
+
+.reader-content {
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  max-width: var(--max-reading-width);
+  margin: 0 auto;
+  padding: 2rem var(--page-margin);
+  padding-bottom: 6rem;
+}
+
+.reader-content.font-serif {
+  font-family: Georgia, Cambria, 'Times New Roman', serif;
+  letter-spacing: 0.01em;
+}
+
+.reader-content.font-sans {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.reader-content.font-lora {
+  font-family: 'Lora', Georgia, serif;
+  letter-spacing: 0.01em;
+}
+
+.reader-content.font-merriweather {
+  font-family: 'Merriweather', Georgia, serif;
+  letter-spacing: 0.01em;
+}
+
+.reader-content.font-source-serif {
+  font-family: 'Source Serif 4', Georgia, serif;
+  letter-spacing: 0.01em;
+}
+
+.reader-content.font-nunito {
+  font-family: 'Nunito', system-ui, sans-serif;
+}
+
+.reader-content.font-crimson {
+  font-family: 'Crimson Text', Georgia, serif;
+  letter-spacing: 0.01em;
+}
+
+/* Headings - clear hierarchy, generous spacing */
+.reader-content h1 {
+  @apply text-2xl font-semibold mt-12 mb-6;
+  letter-spacing: -0.02em;
+}
+
+.reader-content h2 {
+  @apply text-xl font-semibold mt-10 mb-4;
+  letter-spacing: -0.01em;
+}
+
+.reader-content h3 {
+  @apply text-lg font-medium mt-8 mb-3;
+}
+
+.reader-content h4,
+.reader-content h5,
+.reader-content h6 {
+  @apply text-base font-medium mt-6 mb-2;
+}
+
+/* Body text - comfortable reading */
+.reader-content p {
+  @apply mb-6;
+  text-align: left;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
+
+/* Links - subtle, not distracting */
+.reader-content a {
+  @apply text-accent underline underline-offset-2;
+  text-decoration-thickness: 1px;
+}
+
+/* Lists - proper indentation */
+.reader-content ul,
+.reader-content ol {
+  @apply mb-6 pl-6;
+}
+
+.reader-content ul {
+  list-style-type: disc;
+}
+
+.reader-content ol {
+  list-style-type: decimal;
+}
+
+.reader-content li {
+  @apply mb-2;
+}
+
+.reader-content li::marker {
+  @apply text-ink-light/40 dark:text-ink-dark/40;
+}
+
+/* Blockquotes - elegant, not boxy */
+.reader-content blockquote {
+  @apply my-6 pl-5 italic text-ink-light/70 dark:text-ink-dark/70;
+  border-left: 2px solid #b4846c;
+}
+
+/* Code - minimal styling */
+.reader-content pre {
+  @apply bg-ink-light/5 dark:bg-ink-dark/5 p-4 overflow-x-auto my-6 text-sm rounded;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.dark .reader-content pre {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.reader-content code {
+  @apply text-sm px-1;
+  background: rgba(0,0,0,0.04);
+  border-radius: 3px;
+}
+
+.dark .reader-content code {
+  background: rgba(255,255,255,0.08);
+}
+
+.reader-content pre code {
+  @apply bg-transparent p-0;
+}
+
+/* Tables - clean, minimal */
+.reader-content table {
+  @apply w-full my-6 text-sm;
+  border-collapse: collapse;
+}
+
+.reader-content th,
+.reader-content td {
+  @apply px-3 py-2 text-left;
+  border-bottom: 1px solid theme('colors.gray.200');
+}
+
+.dark .reader-content th,
+.dark .reader-content td {
+  border-color: theme('colors.gray.800');
+}
+
+.reader-content th {
+  @apply font-medium;
+}
+
+/* Images - clean */
+.reader-content img {
+  @apply max-w-full h-auto my-6 cursor-pointer;
+}
+
+/* Horizontal rule - subtle */
+.reader-content hr {
+  @apply my-12 border-0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, theme('colors.gray.300'), transparent);
+}
+
+.dark .reader-content hr {
+  background: linear-gradient(to right, transparent, theme('colors.gray.700'), transparent);
+}
+
+/* ================================
+   SAFE AREAS (Mobile)
+   For notch, home indicator, etc.
+   ================================ */
+
+.safe-bottom {
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 12px);
+}
+
+.safe-top {
+  padding-top: max(env(safe-area-inset-top, 0px), 12px);
+}
+
+/* Extra padding variants for more breathing room */
+.safe-bottom-lg {
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 20px);
+}
+
+.safe-top-lg {
+  padding-top: max(env(safe-area-inset-top, 0px), 20px);
+}
+
+/* ================================
+   UTILITY CLASSES
+   ================================ */
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Focus styles - subtle */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  @apply outline-none ring-2 ring-accent/50 ring-offset-2 ring-offset-paper-light dark:ring-offset-paper-dark;
+}
+
+/* Loading spinner */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* ================================
+   DATE INPUT THEMING
+   Match calendar picker to app theme
+   ================================ */
+
+/* Style the date input */
+input[type="date"] {
+  color-scheme: light dark;
+  position: relative;
+}
+
+/* Calendar icon color */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.6;
+  filter: none;
+  transition: opacity 0.2s;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+/* Dark mode calendar icon */
+.dark input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
+/* Date input focus state with accent color */
+input[type="date"]:focus {
+  border-color: #0d9488 !important;
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+}
+
+/* Style the date picker popup (Chromium browsers) */
+::-webkit-datetime-edit {
+  padding: 0;
+}
+
+::-webkit-datetime-edit-fields-wrapper {
+  padding: 0;
+}
+
+::-webkit-datetime-edit-text {
+  color: #a3a3a3;
+  padding: 0 0.2em;
+}
+
+::-webkit-datetime-edit-month-field,
+::-webkit-datetime-edit-day-field,
+::-webkit-datetime-edit-year-field {
+  color: inherit;
+}
+
+::-webkit-datetime-edit-month-field:focus,
+::-webkit-datetime-edit-day-field:focus,
+::-webkit-datetime-edit-year-field:focus {
+  background-color: rgba(13, 148, 136, 0.15);
+  color: #0d9488;
+  outline: none;
+  border-radius: 2px;
+}
+
+/* ================================
+   UX ENHANCEMENTS
+   ================================ */
+
+/* Smooth page transitions */
+.page-transition {
+  animation: pageSlideIn 0.25s ease-out;
+}
+
+@keyframes pageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Active press state for buttons */
+button:active,
+a:active {
+  transform: scale(0.98);
+}
+
+/* Prevent text selection on interactive elements */
+button,
+nav,
+.no-select {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Smooth overscroll */
+.overscroll-smooth {
+  overscroll-behavior: contain;
+}
+
+/* Better touch targets - minimum 44px */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Skeleton loading animation */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.06) 25%,
+    rgba(0, 0, 0, 0.1) 50%,
+    rgba(0, 0, 0, 0.06) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.dark .skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.06) 25%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.06) 75%
+  );
+  background-size: 200% 100%;
+}

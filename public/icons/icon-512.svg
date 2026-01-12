@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- Background with gradient -->
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#14b8a6"/>
+      <stop offset="100%" stop-color="#0d9488"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)"/>
+  
+  <!-- Open book icon -->
+  <g transform="translate(96, 120)">
+    <!-- Left page -->
+    <path d="M160 32C120 32 72 48 40 72V248C72 224 120 208 160 208V32Z" fill="white" opacity="0.95"/>
+    <!-- Right page -->
+    <path d="M160 32C200 32 248 48 280 72V248C248 224 200 208 160 208V32Z" fill="white" opacity="0.85"/>
+    <!-- Spine -->
+    <path d="M160 32V208" stroke="white" stroke-width="4" opacity="0.6"/>
+    <!-- Text lines left -->
+    <path d="M70 80H140M70 110H130M70 140H135M70 170H125" stroke="#0d9488" stroke-width="6" stroke-linecap="round" opacity="0.4"/>
+    <!-- Text lines right -->
+    <path d="M180 80H250M180 110H240M180 140H245M180 170H235" stroke="#0d9488" stroke-width="6" stroke-linecap="round" opacity="0.3"/>
+  </g>
+  
+  <!-- Decorative sparkle -->
+  <circle cx="400" cy="112" r="8" fill="white" opacity="0.6"/>
+  <circle cx="380" cy="140" r="4" fill="white" opacity="0.4"/>
+</svg>
