@@ -36,6 +36,11 @@ export default function ReaderScreen() {
   const [bookmarkId, setBookmarkId] = useState<string | null>(null);
   const [showAnnotation, setShowAnnotation] = useState(false);
   const [annotationHeading, setAnnotationHeading] = useState<TocItem | null>(null);
+  
+  // Zoom state for content
+  const [contentScale, setContentScale] = useState(1);
+  const lastPinchDistance = useRef<number | null>(null);
+  const [hasRestoredProgress, setHasRestoredProgress] = useState(false);
 
   // Load settings on mount
   useEffect(() => {
@@ -75,13 +80,18 @@ export default function ReaderScreen() {
               const element = document.getElementById(progress.headingId);
               if (element) {
                 element.scrollIntoView();
+                setHasRestoredProgress(true);
                 return;
               }
             }
             // Fallback to percentage
             const scrollHeight = document.documentElement.scrollHeight;
             window.scrollTo(0, scrollHeight * progress.offsetPercent);
+            setHasRestoredProgress(true);
           }, 100);
+        } else {
+          // No saved progress, allow saving immediately
+          setHasRestoredProgress(true);
         }
       } catch (err) {
         console.error('Failed to load content:', err);
@@ -111,8 +121,10 @@ export default function ReaderScreen() {
     });
   }, [sourceId, filePath, content]);
 
-  // Debounced scroll handler
+  // Debounced scroll handler - only save after progress has been restored
   useEffect(() => {
+    if (!hasRestoredProgress) return;
+
     let timeout: ReturnType<typeof setTimeout>;
 
     const handleScroll = () => {
@@ -125,7 +137,58 @@ export default function ReaderScreen() {
       window.removeEventListener('scroll', handleScroll);
       clearTimeout(timeout);
     };
-  }, [saveProgress]);
+  }, [saveProgress, hasRestoredProgress]);
+
+  // Pinch-to-zoom handlers for touch devices
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      const distance = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      lastPinchDistance.current = distance;
+    }
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (e.touches.length === 2 && lastPinchDistance.current !== null) {
+      const distance = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      const delta = distance / lastPinchDistance.current;
+      setContentScale((prev) => Math.min(Math.max(prev * delta, 0.5), 3));
+      lastPinchDistance.current = distance;
+    }
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    lastPinchDistance.current = null;
+  }, []);
+
+  // Mouse wheel zoom with Ctrl key
+  const handleWheel = useCallback((e: React.WheelEvent) => {
+    if (e.ctrlKey || e.metaKey) {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? 0.95 : 1.05;
+      setContentScale((prev) => Math.min(Math.max(prev * delta, 0.5), 3));
+    }
+  }, []);
+
+  // Double-tap to reset zoom
+  const lastTapTime = useRef(0);
+  const handleDoubleTap = useCallback(() => {
+    const now = Date.now();
+    if (now - lastTapTime.current < 300) {
+      // Double tap detected - reset zoom or zoom in
+      if (contentScale !== 1) {
+        setContentScale(1);
+      } else {
+        setContentScale(1.5);
+      }
+    }
+    lastTapTime.current = now;
+  }, [contentScale]);
 
   // Handle content tap
   const handleContentClick = (e: React.MouseEvent) => {
@@ -150,6 +213,9 @@ export default function ReaderScreen() {
       }
       return;
     }
+
+    // Check for double tap to toggle zoom
+    handleDoubleTap();
 
     // Toggle controls on tap
     setShowControls(!showControls);
@@ -236,7 +302,13 @@ export default function ReaderScreen() {
   const fileName = filePath.split('/').pop()?.replace('.md', '') || 'Document';
 
   return (
-    <div className="min-h-screen bg-paper-light dark:bg-paper-dark transition-colors duration-300">
+    <div 
+      className="min-h-screen bg-paper-light dark:bg-paper-dark transition-colors duration-300"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      onWheel={handleWheel}
+    >
       {/* Reader Controls - invisible until tap */}
       <ReaderControls
         visible={showControls}
@@ -246,6 +318,10 @@ export default function ReaderScreen() {
         onToggleBookmark={handleToggleBookmark}
         onAddNote={handleAddNote}
         isBookmarked={isBookmarked}
+        scale={contentScale}
+        onZoomIn={() => setContentScale((prev) => Math.min(prev + 0.25, 3))}
+        onZoomOut={() => setContentScale((prev) => Math.max(prev - 0.25, 0.5))}
+        onZoomReset={() => setContentScale(1)}
       />
 
       {/* Main reading area - generous padding for comfortable reading */}
@@ -256,11 +332,20 @@ export default function ReaderScreen() {
           FONT_CLASS_MAP[settings.fontFamily] || 'font-sans'
         }`}
         style={{
-          fontSize: `${settings.fontSize}px`,
+          fontSize: `${settings.fontSize * contentScale}px`,
           lineHeight: settings.lineHeight,
+          transformOrigin: 'top center',
+          transition: 'font-size 0.15s ease-out',
         }}
         dangerouslySetInnerHTML={{ __html: html }}
       />
+
+      {/* Zoom indicator */}
+      {contentScale !== 1 && (
+        <div className="fixed bottom-6 right-6 z-30 bg-ink-light/10 dark:bg-ink-dark/10 text-ink-light/60 dark:text-ink-dark/60 text-xs px-3 py-1.5 rounded-full">
+          {Math.round(contentScale * 100)}%
+        </div>
+      )}
 
       {/* Table of Contents */}
       <TableOfContents

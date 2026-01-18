@@ -1,5 +1,6 @@
 import { getDatabase } from '../db';
 import type { FileEntry, FileContent } from '../types';
+import { localFilesRepository } from './localFilesRepository';
 
 export const fileRepository = {
   async getBySource(sourceId: string): Promise<FileEntry[]> {
@@ -59,6 +60,36 @@ export const fileRepository = {
   },
 
   async getContent(sourceId: string, path: string): Promise<FileContent | undefined> {
+    // Handle local files from LocalFilesScreen (format: local:folderId)
+    if (sourceId.startsWith('local:')) {
+      const localFile = await localFilesRepository.getFile(path);
+      if (!localFile) return undefined;
+      
+      const isMarkdown = localFile.name.toLowerCase().endsWith('.md');
+      let content = localFile.content;
+      
+      // If it's markdown and stored as blob, convert to string
+      if (isMarkdown && content instanceof Blob) {
+        content = await content.text();
+      }
+      
+      return {
+        id: `${sourceId}:${path}`,
+        sourceId,
+        path,
+        content,
+        isMarkdown,
+      };
+    }
+    
+    // Handle local files from Settings page (format: local) - stored in fileContents
+    if (sourceId === 'local') {
+      const db = await getDatabase();
+      const id = `${sourceId}:${path}`;
+      return db.get('fileContents', id);
+    }
+    
+    // Handle GitHub sources
     const db = await getDatabase();
     const id = `${sourceId}:${path}`;
     return db.get('fileContents', id);

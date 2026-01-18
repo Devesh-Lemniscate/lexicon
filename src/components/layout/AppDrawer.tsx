@@ -150,32 +150,39 @@ export default function AppDrawer({ isOpen, onClose, onSelect, selectedId }: App
       >
         {/* Arc items */}
         <div className="relative" style={{ width: CIRCLE_RADIUS * 2 + 60, height: CIRCLE_RADIUS + 60 }}>
-          {positions.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => handleItemClick(item)}
-              className={`absolute flex flex-col items-center justify-center transition-all duration-200 ${
-                selectedId === item.id
-                  ? 'text-accent scale-110'
-                  : 'text-white/90 hover:text-white'
-              }`}
-              style={{
-                left: `calc(50% + ${item.x}px - 28px)`,
-                bottom: `${item.y + CIRCLE_RADIUS}px`,
-                width: 56,
-                height: 56,
-              }}
-            >
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${
-                selectedId === item.id
-                  ? 'bg-accent/20'
-                  : 'bg-white/10'
-              }`}>
-                {item.icon}
-              </div>
-              <span className="text-xs mt-1 font-medium whitespace-nowrap">{item.label}</span>
-            </button>
-          ))}
+          {positions.map((item) => {
+            const isSelected = selectedId === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => handleItemClick(item)}
+                className={`absolute flex flex-col items-center justify-center transition-all duration-200 ${
+                  isSelected
+                    ? 'text-accent scale-110'
+                    : 'text-white/70 hover:text-white'
+                }`}
+                style={{
+                  left: `calc(50% + ${item.x}px - 28px)`,
+                  bottom: `${item.y + CIRCLE_RADIUS}px`,
+                  width: 56,
+                  height: 56,
+                }}
+              >
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 ${
+                  isSelected
+                    ? 'bg-accent text-white shadow-lg shadow-accent/40'
+                    : 'bg-white/10'
+                }`}>
+                  {item.icon}
+                </div>
+                <span className={`text-xs mt-1 font-medium whitespace-nowrap transition-colors ${
+                  isSelected ? 'text-accent' : ''
+                }`}>
+                  {item.label}
+                </span>
+              </button>
+            );
+          })}
         </div>
 
         {/* Close hint */}

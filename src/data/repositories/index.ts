@@ -8,3 +8,4 @@ export { settingsRepository } from './settingsRepository';
 export { todoRepository } from './todoRepository';
 export { ideaRepository } from './ideaRepository';
 export { imageAnnotationRepository } from './imageAnnotationRepository';
+export { localFilesRepository } from './localFilesRepository';

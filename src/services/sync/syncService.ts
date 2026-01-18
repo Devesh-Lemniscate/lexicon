@@ -138,26 +138,31 @@ export const syncService = {
             parentPath,
           });
 
+          // Check if it's a markdown file for search indexing
+          const isMarkdownFile = file.path.toLowerCase().endsWith('.md');
+
           // Save file content
           if (isText) {
             await fileRepository.saveContent({
               sourceId: source.id,
               path: file.path,
               content: content as string,
-              isMarkdown: true,
+              isMarkdown: isMarkdownFile,
             });
 
-            // Build search index entry for markdown files
-            const extracted = extractSearchContent(content as string);
-            searchEntries.push({
-              sourceId: source.id,
-              filePath: file.path,
-              title: extracted.title || name.replace('.md', ''),
-              content: extracted.content,
-              headings: extracted.headings,
-            });
+            // Build search index entry for markdown files only
+            if (isMarkdownFile) {
+              const extracted = extractSearchContent(content as string);
+              searchEntries.push({
+                sourceId: source.id,
+                filePath: file.path,
+                title: extracted.title || name.replace('.md', ''),
+                content: extracted.content,
+                headings: extracted.headings,
+              });
+            }
           } else {
-            // Convert ArrayBuffer to Blob for images
+            // Convert ArrayBuffer to Blob for binary files (images, PDFs)
             const blob = new Blob([content as ArrayBuffer], { type: mimeType });
             await fileRepository.saveContent({
               sourceId: source.id,
@@ -241,8 +246,14 @@ export const syncService = {
 function getMimeType(path: string): string {
   const ext = path.toLowerCase().split('.').pop();
   switch (ext) {
+    // Documents
     case 'md':
       return 'text/markdown';
+    case 'txt':
+      return 'text/plain';
+    case 'pdf':
+      return 'application/pdf';
+    // Images
     case 'png':
       return 'image/png';
     case 'jpg':
@@ -250,6 +261,30 @@ function getMimeType(path: string): string {
       return 'image/jpeg';
     case 'webp':
       return 'image/webp';
+    case 'gif':
+      return 'image/gif';
+    case 'svg':
+      return 'image/svg+xml';
+    case 'bmp':
+      return 'image/bmp';
+    case 'ico':
+      return 'image/x-icon';
+    // Data formats
+    case 'json':
+      return 'application/json';
+    case 'yaml':
+    case 'yml':
+      return 'text/yaml';
+    case 'xml':
+      return 'application/xml';
+    case 'html':
+      return 'text/html';
+    case 'css':
+      return 'text/css';
+    case 'csv':
+      return 'text/csv';
+    case 'excalidraw':
+      return 'application/json';
     default:
       return 'application/octet-stream';
   }

@@ -78,6 +78,25 @@ export interface LastOpenedFile {
   timestamp: number;
 }
 
+// Local folder for device files
+export interface LocalFolder {
+  id: string;
+  name: string;
+  createdAt: number;
+}
+
+// Local file from device
+export interface LocalFile {
+  id: string;
+  folderId: string;
+  name: string;
+  path: string; // Virtual path within folder
+  mimeType: string;
+  size: number;
+  content: Blob | string;
+  createdAt: number;
+}
+
 // GitHub API types
 export interface GitHubTreeItem {
   path: string;

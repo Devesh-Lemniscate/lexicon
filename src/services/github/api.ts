@@ -2,8 +2,17 @@ import type { GitHubTree, GitHubTreeItem } from '@/data/types';
 
 const GITHUB_API_BASE = 'https://api.github.com';
 
-// Allowed file extensions
-const ALLOWED_EXTENSIONS = ['.md', '.png', '.jpg', '.jpeg', '.webp'];
+// Allowed file extensions - expanded to support more formats
+const ALLOWED_EXTENSIONS = [
+  // Documents
+  '.md', '.txt', '.pdf',
+  // Images
+  '.png', '.jpg', '.jpeg', '.webp', '.gif', '.svg', '.bmp', '.ico',
+  // Diagrams
+  '.excalidraw',
+  // Code/text files that can be read
+  '.json', '.yaml', '.yml', '.xml', '.html', '.css', '.csv',
+];
 
 function isAllowedFile(path: string): boolean {
   const lowerPath = path.toLowerCase();
@@ -83,9 +92,12 @@ export const githubApi = {
       throw new Error(`Failed to fetch file: ${response.status}`);
     }
 
-    const isMarkdown = path.toLowerCase().endsWith('.md');
+    const lowerPath = path.toLowerCase();
+    // Text-based files that should be read as text
+    const textExtensions = ['.md', '.txt', '.json', '.yaml', '.yml', '.xml', '.html', '.css', '.csv', '.excalidraw'];
+    const isText = textExtensions.some(ext => lowerPath.endsWith(ext));
 
-    if (isMarkdown) {
+    if (isText) {
       const content = await response.text();
       return { content, isText: true };
     } else {

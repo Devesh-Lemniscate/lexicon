@@ -17,6 +17,9 @@ const IdeasScreen = lazy(() => import('./components/ideas/IdeasScreen'));
 const NotesScreen = lazy(() => import('./components/notes/NotesScreen'));
 const ExcalidrawViewer = lazy(() => import('./components/reader/ExcalidrawViewer'));
 const ImageViewerScreen = lazy(() => import('./components/reader/ImageViewerScreen'));
+const PDFViewerScreen = lazy(() => import('./components/reader/PDFViewerScreen'));
+const TextViewerScreen = lazy(() => import('./components/reader/TextViewerScreen'));
+const LocalFilesScreen = lazy(() => import('./components/library/LocalFilesScreen'));
 
 function App() {
   // Initialize notification service for todo reminders
@@ -33,12 +36,15 @@ function App() {
           <Route path="/read/:sourceId/*" element={<ReaderScreen />} />
           <Route path="/excalidraw/:sourceId/*" element={<ExcalidrawViewer />} />
           <Route path="/image/:sourceId/*" element={<ImageViewerScreen />} />
+          <Route path="/pdf/:sourceId/*" element={<PDFViewerScreen />} />
+          <Route path="/text/:sourceId/*" element={<TextViewerScreen />} />
           
           {/* Main app routes with bottom nav */}
           <Route element={<AppShell />}>
             <Route path="/" element={<Navigate to="/library" replace />} />
             <Route path="/library" element={<LibraryScreen />} />
             <Route path="/library/:sourceId/*" element={<FolderView />} />
+            <Route path="/local-files/*" element={<LocalFilesScreen />} />
             <Route path="/search" element={<SearchScreen />} />
             <Route path="/bookmarks" element={<BookmarksScreen />} />
             <Route path="/todos" element={<TodosScreen />} />

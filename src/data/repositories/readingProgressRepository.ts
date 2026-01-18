@@ -47,4 +47,23 @@ export const readingProgressRepository = {
       timestamp: Date.now(),
     });
   },
+
+  async getMostRecentlyOpened(): Promise<LastOpenedFile | undefined> {
+    const db = await getDatabase();
+    const allOpened = await db.getAll('lastOpened');
+    if (allOpened.length === 0) return undefined;
+    
+    // Sort by timestamp descending and return the most recent
+    allOpened.sort((a, b) => b.timestamp - a.timestamp);
+    return allOpened[0];
+  },
+
+  async getAllRecentlyOpened(limit: number = 5): Promise<LastOpenedFile[]> {
+    const db = await getDatabase();
+    const allOpened = await db.getAll('lastOpened');
+    
+    // Sort by timestamp descending
+    allOpened.sort((a, b) => b.timestamp - a.timestamp);
+    return allOpened.slice(0, limit);
+  },
 };

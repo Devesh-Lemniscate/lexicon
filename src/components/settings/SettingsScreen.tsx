@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useThemeStore, useReaderSettingsStore } from '@/store';
 import { renderMarkdown } from '@/utils/markdown';
 import { fileRepository } from '@/data/repositories';
@@ -21,6 +22,7 @@ const getFontClass = (font: ReaderSettings['fontFamily']) => {
 };
 
 export default function SettingsScreen() {
+  const navigate = useNavigate();
   const { theme, setTheme } = useThemeStore();
   const { settings, updateSettings, loadSettings } = useReaderSettingsStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -48,18 +50,20 @@ export default function SettingsScreen() {
 
     // Determine file type
     const isMarkdown = ext === 'md';
-    const isImage = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'].includes(ext || '');
+    const isImage = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'bmp'].includes(ext || '');
     const isExcalidraw = file.name.endsWith('.excalidraw');
+    const isPdf = ext === 'pdf';
+    const isText = ['txt', 'json', 'yaml', 'yml', 'xml', 'html', 'css', 'csv'].includes(ext || '');
 
     try {
-      if (isMarkdown) {
-        // Text content for markdown
+      if (isMarkdown || isText) {
+        // Text content for markdown and text files
         const content = await file.text();
         await fileRepository.saveContent({
           sourceId: localSourceId,
           path: filePath,
           content,
-          isMarkdown: true,
+          isMarkdown: isMarkdown,
         });
         await fileRepository.upsert({
           sourceId: localSourceId,
@@ -69,12 +73,16 @@ export default function SettingsScreen() {
           sha: crypto.randomUUID(),
           size: file.size,
           parentPath: '',
-          mimeType: 'text/markdown',
+          mimeType: isMarkdown ? 'text/markdown' : file.type || 'text/plain',
         });
-        window.location.href = `/read/${localSourceId}/${filePath}`;
+        if (isMarkdown) {
+          navigate(`/read/${localSourceId}/${filePath}`);
+        } else {
+          navigate(`/text/${localSourceId}/${filePath}`);
+        }
       } else if (isImage) {
         // Binary content for images
-        const blob = await file.arrayBuffer().then(buf => new Blob([buf], { type: file.type }));
+        const blob = new Blob([await file.arrayBuffer()], { type: file.type });
         await fileRepository.saveContent({
           sourceId: localSourceId,
           path: filePath,
@@ -91,7 +99,27 @@ export default function SettingsScreen() {
           parentPath: '',
           mimeType: file.type,
         });
-        window.location.href = `/image/${localSourceId}/${filePath}`;
+        navigate(`/image/${localSourceId}/${filePath}`);
+      } else if (isPdf) {
+        // Binary content for PDFs
+        const blob = new Blob([await file.arrayBuffer()], { type: 'application/pdf' });
+        await fileRepository.saveContent({
+          sourceId: localSourceId,
+          path: filePath,
+          content: blob,
+          isMarkdown: false,
+        });
+        await fileRepository.upsert({
+          sourceId: localSourceId,
+          path: filePath,
+          name: file.name,
+          type: 'file',
+          sha: crypto.randomUUID(),
+          size: file.size,
+          parentPath: '',
+          mimeType: 'application/pdf',
+        });
+        navigate(`/pdf/${localSourceId}/${filePath}`);
       } else if (isExcalidraw) {
         // JSON content for excalidraw
         const content = await file.text();
@@ -111,7 +139,7 @@ export default function SettingsScreen() {
           parentPath: '',
           mimeType: 'application/excalidraw+json',
         });
-        window.location.href = `/excalidraw/${localSourceId}/${filePath}`;
+        navigate(`/excalidraw/${localSourceId}/${filePath}`);
       } else {
         console.warn('Unsupported file type:', ext);
       }
@@ -272,7 +300,7 @@ export default function SettingsScreen() {
         <input
           ref={fileInputRef}
           type="file"
-          accept=".md,.excalidraw,.png,.jpg,.jpeg,.gif,.webp,.svg,text/markdown,image/*"
+          accept=".md,.pdf,.txt,.json,.yaml,.yml,.xml,.html,.css,.csv,.excalidraw,.png,.jpg,.jpeg,.gif,.webp,.svg,.bmp,text/markdown,text/plain,application/pdf,application/json,image/*"
           onChange={handleFileChange}
           className="hidden"
         />

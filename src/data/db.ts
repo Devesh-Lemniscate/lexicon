@@ -11,10 +11,12 @@ import type {
   TodoItem,
   Idea,
   ImageAnnotation,
+  LocalFolder,
+  LocalFile,
 } from './types';
 
 const DB_NAME = 'lexicon-db';
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 
 interface NotesReaderDB extends DBSchema {
   sources: {
@@ -74,6 +76,16 @@ interface NotesReaderDB extends DBSchema {
     key: string;
     value: ImageAnnotation;
     indexes: { 'by-source': string; 'by-file': string };
+  };
+  localFolders: {
+    key: string;
+    value: LocalFolder;
+    indexes: { 'by-created': number };
+  };
+  localFiles: {
+    key: string;
+    value: LocalFile;
+    indexes: { 'by-folder': string; 'by-created': number };
   };
 }
 
@@ -161,6 +173,19 @@ export async function getDatabase(): Promise<IDBPDatabase<NotesReaderDB>> {
         const imgAnnotationsStore = db.createObjectStore('imageAnnotations', { keyPath: 'id' });
         imgAnnotationsStore.createIndex('by-source', 'sourceId');
         imgAnnotationsStore.createIndex('by-file', 'filePath');
+      }
+
+      // Local folders store
+      if (!db.objectStoreNames.contains('localFolders')) {
+        const localFoldersStore = db.createObjectStore('localFolders', { keyPath: 'id' });
+        localFoldersStore.createIndex('by-created', 'createdAt');
+      }
+
+      // Local files store
+      if (!db.objectStoreNames.contains('localFiles')) {
+        const localFilesStore = db.createObjectStore('localFiles', { keyPath: 'id' });
+        localFilesStore.createIndex('by-folder', 'folderId');
+        localFilesStore.createIndex('by-created', 'createdAt');
       }
     },
   });
